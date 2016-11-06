@@ -78,8 +78,11 @@ def determine_histogram_edges(traces):
 	min_IAT = log(np.amin([item for sublist in all_IAT_values for item in sublist]))
 	max_IAT = log(np.amax([item for sublist in all_IAT_values for item in sublist]))
 
-	min_size = np.sign(np.amin([item for sublist in all_size_values for item in sublist]))*log(abs(np.amin([item for sublist in all_size_values for item in sublist])))
-	max_size = np.sign(np.amax([item for sublist in all_size_values for item in sublist]))*log(abs(np.amax([item for sublist in all_size_values for item in sublist])))
+	min_size_temp = log(abs(np.amin([item for sublist in all_size_values for item in sublist])))
+	max_size_temp = log(abs(np.amax([item for sublist in all_size_values for item in sublist])))
+
+	min_size = -1*np.max([min_size_temp, max_size_temp])
+	max_size = np.max([min_size_temp, max_size_temp])
 
 	return [[min_size, max_size], [min_IAT, max_IAT]]
 
