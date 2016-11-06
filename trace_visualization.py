@@ -20,8 +20,9 @@ if __name__ == "__main__":
 		plt.xlabel('log(packetsizes)')
 		plt.ylabel('log(IAT)')
 		plt.title('Skype')
-		plt.pcolormesh(X, Y, H.transpose()[::-1])
+		a = plt.pcolormesh(X, Y, H.transpose()[::-1])
 		plt.colorbar()
+		a.set_clim([0,0.6])
 		plt.show()
 
 	for i in Torrent:
@@ -30,8 +31,9 @@ if __name__ == "__main__":
 		plt.xlabel('log(packetsizes)')
 		plt.ylabel('log(IAT)')
 		plt.title('Torrent')
-		plt.pcolormesh(X, Y, H.transpose()[::-1])
+		a = plt.pcolormesh(X, Y, H.transpose()[::-1])
 		plt.colorbar()
+		a.set_clim([0,0.6])
 		plt.show()
 
 	for i in Http:
@@ -40,8 +42,9 @@ if __name__ == "__main__":
 		plt.xlabel('log(packetsizes)')
 		plt.ylabel('log(IAT)')
 		plt.title('Http')		
-		plt.pcolormesh(X, Y, H.transpose()[::-1])
+		a = plt.pcolormesh(X, Y, H.transpose()[::-1])
 		plt.colorbar()
+		a.set_clim([0,0.6])
 		plt.show()
 
 	for i in YouTube:
@@ -50,6 +53,7 @@ if __name__ == "__main__":
 		plt.xlabel('log(packetsizes)')
 		plt.ylabel('log(IAT)')
 		plt.title('YouTube')		
-		plt.pcolormesh(X, Y, H.transpose()[::-1])
+		a = plt.pcolormesh(X, Y, H.transpose()[::-1])
 		plt.colorbar()
+		a.set_clim([0,0.6])
 		plt.show()
