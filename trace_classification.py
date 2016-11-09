@@ -7,7 +7,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import cross_val_score, KFold
 
 if __name__ == "__main__":
-	all_traces = load_traces()
+	all_traces = load_pickled_traces()
 
 	print ['HTTP: 0', 'Skype: 1', 'Torrent: 2', 'Youtube: 3']
 

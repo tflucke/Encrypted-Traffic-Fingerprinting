@@ -9,6 +9,7 @@ class Trace():
 
 	# very low constant to avoid 0 IAT
 	epsilon = 0.000000001
+	window = 1000
 
 
 	def __init__(self):
@@ -30,6 +31,18 @@ class Trace():
 					self.packetsizes.append(-1*len(trace[i]))
 		self.num_packets = len(self.packetsizes)
 
+	def construct_trace(self, packets, times, label):
+		self.packetsizes = packets
+		self.timestamps = times
+		self.label = label
+		self.num_packets = len(packets)
+
+	def get_timestamps(self):
+		return self.timestamps
+
+	def get_packetsizes(self):
+		return self.packetsizes
+
 	# Get the IAT array of a trace
 	def get_IAT(self):
 		IAT = [self.epsilon]
@@ -40,4 +53,17 @@ class Trace():
 			else:
 				IAT.append(self.epsilon)
 		return IAT
-		
+	
+	# Get a list of windowed traces
+	def get_windowed(self):
+		windowed = []
+		packets = self.get_packetsizes()
+		times = self.get_timestamps()
+
+		for x in range(0,(self.num_packets/self.window)):
+			temp = Trace()
+			temp.construct_trace(packets[x*self.window:(x+1)*self.window], times[x*self.window:(x+1)*self.window], self.label)
+			windowed.append(temp)
+
+		return windowed
+

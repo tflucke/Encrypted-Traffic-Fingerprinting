@@ -1,6 +1,7 @@
 from trace import *
 import glob
 import random
+import cPickle as pickle
 import numpy as np
 from math import log
 from time import strftime
@@ -9,6 +10,7 @@ from scipy.sparse import csr_matrix, vstack
 traffic_types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
 suffixes = ['','','_part','']
 path = 'traces/'
+object_file = 'traces/pickled_traces.dat'
 
 # Load all traces that match the reg exp
 def load_traces():
@@ -86,3 +88,25 @@ def determine_histogram_edges(traces):
 
 	return [[min_size, max_size], [min_IAT, max_IAT]]
 
+# Window all given traces
+def window_all_traces(traces):
+	all_windowed = []
+	for trace in traces:
+		all_windowed.extend(trace.get_windowed())
+
+	return all_windowed
+
+# Pickle the traces to avoid reading pcaps	
+def pickle_traces(traces):
+	with open(object_file, "wb") as f:
+	    pickle.dump(len(traces), f)
+	    for value in traces:
+	        pickle.dump(value, f)
+
+
+def load_pickled_traces():
+	traces = []
+	with open(object_file, "rb") as f:
+		for _ in range(pickle.load(f)):
+			traces.append(pickle.load(f))
+	return traces
