@@ -38,7 +38,7 @@ def first_x_packets(all_traces, label, nr):
 def generate_histogram(trace, fixed_range=None):
 	log_packetsize = [np.sign(i)*log(abs(i)) for i in trace.packetsizes]
 	log_IAT = [log(i) for i in trace.get_IAT()]
-	hist,x,y = np.histogram2d(log_packetsize, log_IAT, bins = (20, 20), normed = True, range= fixed_range)
+	hist,x,y = np.histogram2d(log_packetsize, log_IAT, bins = (32, 32), normed = True, range= fixed_range)
 	return hist, x,y
 
 # Generate a feature matrix with the 2D histogram data
