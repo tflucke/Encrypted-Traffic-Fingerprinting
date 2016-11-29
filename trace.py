@@ -1,5 +1,6 @@
 from scapy.all import *
 import sys
+import numpy as np
 
 class Trace():
 	"""This class represents a pcap network trace as two lists and a label"""
@@ -54,6 +55,38 @@ class Trace():
 				IAT.append(self.epsilon)
 		return IAT
 	
+	# Get the burst size (bytes) and times arrays of a trace
+	def get_burst_info(self):
+		burst_size_bytes = []
+		burst_size_time = []
+		last_direction = np.sign(self.packetsizes[0])
+		burst_start = self.timestamps[0]
+		burst_stop = 0
+		burst_bytes = self.packetsizes[0]
+		
+		for x in range(1, self.num_packets):
+			if last_direction == np.sign(self.packetsizes[x]):
+				burst_bytes = last_direction*(abs(burst_bytes)+abs(self.packetsizes[x]))
+				if x == self.num_packets-1:
+					burst_stop = self.timestamps[x]
+					if burst_stop - burst_start > 0:
+						burst_size_time.append(burst_stop - burst_start)
+					else:
+						burst_size_time.append(self.epsilon)
+					burst_size_bytes.append(burst_bytes)
+			else:
+				last_direction = np.sign(self.packetsizes[x])
+				burst_stop = self.timestamps[x-1]
+				if burst_stop - burst_start > 0:
+					burst_size_time.append(burst_stop - burst_start)
+				else:
+					burst_size_time.append(self.epsilon)
+				burst_start = self.timestamps[x]
+				burst_size_bytes.append(burst_bytes)
+				burst_bytes = self.packetsizes[x]
+		return burst_size_bytes, burst_size_time
+
+
 	# Get a list of windowed traces
 	def get_windowed(self):
 		windowed = []
