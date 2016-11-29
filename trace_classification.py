@@ -6,6 +6,7 @@ from scipy.sparse import csr_matrix, vstack
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import cross_val_score, KFold
 
 import itertools
@@ -68,7 +69,7 @@ if __name__ == "__main__":
         elif METHOD == 'RF':
             clf = RandomForestClassifier()
         elif METHOD == 'MLP':
-            pass
+            clf = MLPClassifier(solver = 'sgd', learning_rate = 'adaptive')
         elif METHOD == 'LR':
             clf = LogisticRegression()
         clf.fit(feature_matrix, classes)
