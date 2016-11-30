@@ -7,7 +7,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import cross_val_score, KFold
+from sklearn.model_selection import cross_val_score, KFold, train_test_split
 
 import itertools
 import matplotlib.pyplot as plt
@@ -15,7 +15,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
 FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT' or 'burst')
-METHOD = 'RF' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+METHOD = 'MLP' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+TEST_SIZE = 0.20
 
 def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
     """
@@ -47,48 +48,77 @@ if __name__ == "__main__":
     all_traces = load_pickled_traces()
     windowed_traces = window_all_traces(all_traces)
 
-    # print ['HTTP: 0', 'Skype: 1', 'Torrent: 2', 'Youtube: 3']
+    # kf = KFold(n_splits=4, shuffle=True)
+    # for train, test in kf.split(windowed_traces):
+    #     # Seperate train list from test list
+    #     train_list = [windowed_traces[i] for i in train]
+    #     print 'Number of training samples: ' + str(len(train_list))
+    #     test_list = [windowed_traces[i] for i in test]
+    #     print 'Number of validation samples: ' + str(len(test_list))
 
-    kf = KFold(n_splits=4, shuffle=True)
-    for train, test in kf.split(windowed_traces):
-        # Seperate train list from test list
-        train_list = [windowed_traces[i] for i in train]
-        print 'Number of training samples: ' + str(len(train_list))
-        test_list = [windowed_traces[i] for i in test]
-        print 'Number of validation samples: ' + str(len(test_list))
+    #     if FEATURE == 'size_IAT':
+    #         feature_matrix, classes, train_range = build_feature_matrix_size_IAT(train_list)
+    #         feature_matrix_test, classes_test, test_range = build_feature_matrix_size_IAT(test_list, train_range)
+    #     elif FEATURE == 'burst':
+    #         feature_matrix, classes, train_range = build_feature_matrix_burst(train_list)
+    #         feature_matrix_test, classes_test, test_range = build_feature_matrix_burst(test_list, train_range)
 
-        if FEATURE == 'size_IAT':
-            feature_matrix, classes, train_range = build_feature_matrix_size_IAT(train_list)
-            feature_matrix_test, classes_test, test_range = build_feature_matrix_size_IAT(test_list, train_range)
-        elif FEATURE == 'burst':
-            feature_matrix, classes, train_range = build_feature_matrix_burst(train_list)
-            feature_matrix_test, classes_test, test_range = build_feature_matrix_burst(test_list, train_range)
+    #     if METHOD == 'NB':
+    #         clf = MultinomialNB()
+    #     elif METHOD == 'RF':
+    #         clf = RandomForestClassifier()
+    #     elif METHOD == 'MLP':
+    #         clf = MLPClassifier(solver = 'sgd', learning_rate = 'adaptive')
+    #     elif METHOD == 'LR':
+    #         clf = LogisticRegression()
+    #     clf.fit(feature_matrix, classes)
 
-        if METHOD == 'NB':
-            clf = MultinomialNB()
-        elif METHOD == 'RF':
-            clf = RandomForestClassifier()
-        elif METHOD == 'MLP':
-            clf = MLPClassifier(solver = 'sgd', learning_rate = 'adaptive')
-        elif METHOD == 'LR':
-            clf = LogisticRegression()
-        clf.fit(feature_matrix, classes)
+    #     # Show probabilities of the prediction
+    #     #print clf.predict_proba(feature_matrix_test)
 
-        # Show probabilities of the prediction
-        #print clf.predict_proba(feature_matrix_test)
+    #     print clf.score(feature_matrix_test, classes_test)
 
-        print clf.score(feature_matrix_test, classes_test)
-
-        # Compute confusion matrix
-        cnf_matrix = confusion_matrix(classes_test, clf.predict(feature_matrix_test))
-        np.set_printoptions(precision=2)
-        # Plot normalized confusion matrix
+    #     # Compute confusion matrix
+    #     cnf_matrix = confusion_matrix(classes_test, clf.predict(feature_matrix_test))
+    #     np.set_printoptions(precision=2)
+    #     # Plot normalized confusion matrix
         
-        plt.figure()
-        plot_confusion_matrix(cnf_matrix, classes=traffic_types, title='Normalized confusion matrix')
+    #     plt.figure()
+    #     plot_confusion_matrix(cnf_matrix, classes=traffic_types, title='Normalized confusion matrix')
 
-        plt.show()
+    #     plt.show()
 
+    # Split test set
+    labels = [x.label for x in windowed_traces]
+    X_train_val, X_test, y_train_val, y_test = train_test_split(windowed_traces,labels, stratify=np.array(labels), test_size=TEST_SIZE, random_state=0)
+    #print X_train_val, y_train_val, X_test, y_test
+    # Use parameters as obtained from CV_hyperparameters
+    if METHOD == 'NB':
+        clf = MultinomialNB(alpha = 1.0000000000000001e-05)
+    elif METHOD == 'RF':
+        clf = RandomForestClassifier(n_estimators = 5)
+    elif METHOD == 'MLP':
+        clf = MLPClassifier(solver = 'sgd', learning_rate = 'adaptive', random_state = 0, alpha = 1.0000000000000001e-06, max_iter = 300, hidden_layer_sizes = (100, 100))
+    elif METHOD == 'LR':
+        clf = LogisticRegression(C = 1000, tol = 1.0000000000000001e-05)
+    
+    if FEATURE == 'size_IAT':
+        feature_matrix, classes, train_range = build_feature_matrix_size_IAT(X_train_val)
+        feature_matrix_test, classes_test, test_range = build_feature_matrix_size_IAT(X_test, train_range)
+    elif FEATURE == 'burst':
+        feature_matrix, classes, train_range = build_feature_matrix_burst(train_list)
+        feature_matrix_test, classes_test, test_range = build_feature_matrix_burst(X_test, train_range)
 
+    clf.fit(feature_matrix, classes)
+    
+    print clf.score(feature_matrix_test, classes_test)
+    
+    # Compute confusion matrix
+    cnf_matrix = confusion_matrix(classes_test, clf.predict(feature_matrix_test))
+    np.set_printoptions(precision=2)
+    
+    # Plot normalized confusion matrix    
+    plt.figure()
+    plot_confusion_matrix(cnf_matrix, classes=traffic_types, title='Normalized confusion matrix')
 
-
+    plt.show()
