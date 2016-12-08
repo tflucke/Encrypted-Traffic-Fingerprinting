@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
 FEATURE = 'both' # use burst features, size_IAT or both ('size_IAT', 'burst' or 'both')
-METHOD = 'MLP' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+METHOD = 'LR' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 
 parameters = {'size_IAT' : 
@@ -62,7 +62,7 @@ def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blu
 
 if __name__ == "__main__":
     all_traces = load_pickled_traces()
-    windowed_traces = window_all_traces(all_traces)
+    windowed_traces = window_all_traces(all_traces, window_size = 1000)
 
     # kf = KFold(n_splits=4, shuffle=True)
     # for train, test in kf.split(windowed_traces):

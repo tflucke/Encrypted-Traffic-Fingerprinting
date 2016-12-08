@@ -145,10 +145,10 @@ def determine_histogram_edges_burst(traces):
 	return [[min_burst_size, max_burst_size], [min_burst_time, max_burst_time]]
 
 # Window all given traces
-def window_all_traces(traces):
+def window_all_traces(traces, window_size = 1000):
 	all_windowed = []
 	for trace in traces:
-		all_windowed.extend(trace.get_windowed())
+		all_windowed.extend(trace.get_windowed(window_size = window_size))
 
 	return all_windowed
 
