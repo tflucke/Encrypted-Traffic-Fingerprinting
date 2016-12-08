@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT' or 'burst')
+FEATURE = 'both' # use burst features or size_IAT ('size_IAT' or 'burst')
 METHOD = 'MLP' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 
@@ -61,6 +61,9 @@ if __name__ == "__main__":
         elif FEATURE == 'burst':
             feature_matrix, classes, train_range = build_feature_matrix_burst(train_list)
             feature_matrix_val, classes_val, val_range = build_feature_matrix_burst(val_list, train_range)
+        elif FEATURE == 'both':
+            feature_matrix, classes, train_range = build_feature_matrix_both(X_train_val)
+            feature_matrix_val, classes_val, val_range = build_feature_matrix_both(val_list, train_range)  
 
         for par in list(parameters):
             clf.set_params(**par)

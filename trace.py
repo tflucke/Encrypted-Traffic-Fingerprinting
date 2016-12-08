@@ -10,7 +10,6 @@ class Trace():
 
 	# very low constant to avoid 0 IAT
 	epsilon = 0.000000001
-	window = 1000
 
 
 	def __init__(self):
@@ -88,14 +87,15 @@ class Trace():
 
 
 	# Get a list of windowed traces
-	def get_windowed(self):
+	def get_windowed(self, window_size = 1000):
+
 		windowed = []
 		packets = self.get_packetsizes()
 		times = self.get_timestamps()
 
-		for x in range(0,(self.num_packets/self.window)):
+		for x in range(0,(self.num_packets/window_size)):
 			temp = Trace()
-			temp.construct_trace(packets[x*self.window:(x+1)*self.window], times[x*self.window:(x+1)*self.window], self.label)
+			temp.construct_trace(packets[x*window_size:(x+1)*window_size], times[x*window_size:(x+1)*window_size], self.label)
 			windowed.append(temp)
 
 		return windowed

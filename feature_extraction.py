@@ -5,7 +5,7 @@ import cPickle as pickle
 import numpy as np
 from math import log
 from time import strftime
-from scipy.sparse import csr_matrix, vstack
+from scipy.sparse import csr_matrix, vstack, hstack
 
 traffic_types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
 suffixes = ['','','_part','']
@@ -87,6 +87,15 @@ def build_feature_matrix_size_IAT(traces, given_range = None):
 		classes.append(traffic_types.index(x.label))
 
 	return feature_matrix, classes, fixed_range
+
+# Generate a feature matrix with the 2D histogram data
+def build_feature_matrix_both(traces, given_range = (None, None)):
+	feature_matrix_size_IAT, classes, size_IAT_range = build_feature_matrix_size_IAT(traces, given_range[0])
+	feature_matrix_burst, classes, burst_range = build_feature_matrix_burst(traces, given_range[1])
+
+	feature_matrix = hstack([feature_matrix_size_IAT, feature_matrix_burst])
+
+	return csr_matrix(feature_matrix), classes, (size_IAT_range, burst_range)
 
 # Append a row to a csr matrix
 def csr_vappend(a,b):

@@ -14,9 +14,25 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT' or 'burst')
+FEATURE = 'both' # use burst features, size_IAT or both ('size_IAT', 'burst' or 'both')
 METHOD = 'MLP' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
+
+parameters = {'size_IAT' : 
+    {'NB':{'alpha': 1.0000000000000001e-05}, 
+     'RF': {'n_estimators': 5},
+     'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+     'LR': {'C': 1000, 'tol': 1.0000000000000001e-05}},
+ 'burst':
+    {'NB':{'alpha': 1.0000000000000001e-05}, 
+     'RF': {'n_estimators': 10},
+     'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
+     'LR': {'C': 100, 'tol': 1.0000000000000001e-05}}, 
+ 'both': {
+     'NB':{'alpha': 1.0000000000000001e-05}, 
+     'RF': {'n_estimators': 12},
+     'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,)},
+     'LR': {'C': 1, 'tol': 1.0000000000000001e-05}}}
 
 def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
     """
@@ -94,20 +110,26 @@ if __name__ == "__main__":
     #print X_train_val, y_train_val, X_test, y_test
     # Use parameters as obtained from CV_hyperparameters
     if METHOD == 'NB':
-        clf = MultinomialNB(alpha = 1.0000000000000001e-05)
+        clf = MultinomialNB()
     elif METHOD == 'RF':
-        clf = RandomForestClassifier(n_estimators = 5)
+        clf = RandomForestClassifier()
     elif METHOD == 'MLP':
-        clf = MLPClassifier(solver = 'sgd', learning_rate = 'adaptive', random_state = 0, alpha = 1.0000000000000001e-06, max_iter = 300, hidden_layer_sizes = (100, 100))
+        clf = MLPClassifier(solver = 'sgd', learning_rate = 'adaptive', random_state = 0)
     elif METHOD == 'LR':
-        clf = LogisticRegression(C = 1000, tol = 1.0000000000000001e-05)
+        clf = LogisticRegression()
+    
+    # Set parameters
+    clf.set_params(**parameters[FEATURE][METHOD])
     
     if FEATURE == 'size_IAT':
         feature_matrix, classes, train_range = build_feature_matrix_size_IAT(X_train_val)
         feature_matrix_test, classes_test, test_range = build_feature_matrix_size_IAT(X_test, train_range)
     elif FEATURE == 'burst':
-        feature_matrix, classes, train_range = build_feature_matrix_burst(train_list)
+        feature_matrix, classes, train_range = build_feature_matrix_burst(X_train_val)
         feature_matrix_test, classes_test, test_range = build_feature_matrix_burst(X_test, train_range)
+    elif FEATURE == 'both':
+        feature_matrix, classes, train_range = build_feature_matrix_both(X_train_val)
+        feature_matrix_test, classes_test, test_range = build_feature_matrix_both(X_test, train_range)   
 
     clf.fit(feature_matrix, classes)
     
