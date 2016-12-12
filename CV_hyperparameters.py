@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'both' # use burst features or size_IAT ('size_IAT' or 'burst')
-METHOD = 'MLP' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+FEATURE = 'burst' # use burst features or size_IAT ('size_IAT' or 'burst')
+METHOD = 'LR' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     if METHOD == 'NB':
         clf = MultinomialNB()
-        parameters = ParameterGrid({'alpha': np.logspace(-5.0, 0, num=6)})
+        parameters = ParameterGrid({'alpha': np.logspace(-5.0, 5.0, num=11)})
     elif METHOD == 'RF':
         clf = RandomForestClassifier(random_state = 0)
         parameters = ParameterGrid({'n_estimators': range(5,16)})
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         clf = LogisticRegression(solver = 'sag', random_state = 0)
         parameters = ParameterGrid({'C': np.logspace(-5.0, 5.0, num=11), 'tol':np.logspace(-5.0, 5.0, num=11)})
 
-    best = {0 : {'score':0}, 1 : {'score':0}, 2 : {'score':0}, 3 : {'score':0}}
+    results = [{},{},{},{}]
     fold = 0
     kf = KFold(n_splits=4, shuffle=True, random_state=0)
     for train, val in kf.split(X_train_val):
@@ -69,13 +69,22 @@ if __name__ == "__main__":
             clf.set_params(**par)
             clf.fit(feature_matrix, classes)
             prec = clf.score(feature_matrix_val, classes_val)
-            if prec > best[fold]['score']:
-                best[fold] = par
-                best[fold]['score'] = prec
+            results[fold][str(par)] = prec
 
         fold +=1
 
-    print best
+    N = float(len(results))
+    averaged = { k : sum(t[k] for t in results)/N for k in results[0] }
+
+    best = max(averaged, key=averaged.get)
+
+    for idx, val in enumerate(results):
+        print 'fold: ' + str(idx) +'; score: ' + str(val[best])
+    print 'Best parameter setting: ' + best + '; with average score: ' + str(averaged[best])
+
+
+
+
 
 
 
