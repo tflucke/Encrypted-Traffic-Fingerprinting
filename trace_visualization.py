@@ -5,12 +5,12 @@ from time import strftime
 import matplotlib.pyplot as plt
 import numpy.random as nprnd
 
-FEATURE = 'burst' # use burst features or size_IAT ('size_IAT' or 'burst')
+FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT' or 'burst')
 
 
 if __name__ == "__main__":
 	
-	all_traces = load_pickled_traces()
+	all_traces = load_pickled_traces(ipsec=True)
 	if FEATURE == 'size_IAT':
 		overall_range = determine_histogram_edges_size_IAT(all_traces)
 	elif FEATURE == 'burst':

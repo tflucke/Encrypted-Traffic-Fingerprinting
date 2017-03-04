@@ -2,21 +2,23 @@ from scapy.all import *
 import sys
 import numpy as np
 
+
+# The IP from the local computer, for the unencrypted traces : '10.200.1.2'
+# For the ipsec encrypted traces: '192.168.1.2'
+
 class Trace():
 	"""This class represents a pcap network trace as two lists and a label"""
-
-	# The IP from the local computer
-	local_ip = '10.200.1.2'
 
 	# very low constant to avoid 0 IAT
 	epsilon = 0.000000001
 
 
-	def __init__(self):
+	def __init__(self,ip="no ip"):
 		self.label = ""
 		self.timestamps = []
-		self. packetsizes = []
+		self.packetsizes = []
 		self.num_packets = 0
+		self.local_ip = ip
 
 	def load_pcap(self, pathname, label):
 		self.label = label
@@ -87,14 +89,14 @@ class Trace():
 
 
 	# Get a list of windowed traces
-	def get_windowed(self, window_size = 1000):
+	def get_windowed(self, window_size = 1024):
 
 		windowed = []
 		packets = self.get_packetsizes()
 		times = self.get_timestamps()
 
 		for x in range(0,(self.num_packets/window_size)):
-			temp = Trace()
+			temp = Trace(self.local_ip)
 			temp.construct_trace(packets[x*window_size:(x+1)*window_size], times[x*window_size:(x+1)*window_size], self.label)
 			windowed.append(temp)
 

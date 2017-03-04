@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'burst' # use burst features or size_IAT ('size_IAT' or 'burst')
-METHOD = 'LR' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+FEATURE = 'both' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
+METHOD = 'MLP' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 
 
@@ -25,7 +25,7 @@ def log(s):
 
 
 if __name__ == "__main__":
-    all_traces = load_pickled_traces()
+    all_traces = load_pickled_traces(ipsec=True)
     windowed_traces = window_all_traces(all_traces)
 
     # Split test set
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     best = max(averaged, key=averaged.get)
 
     for idx, val in enumerate(results):
-        print 'fold: ' + str(idx) +'; score: ' + str(val[best])
+        print 'fold: ' + str(idx+1) +'; score: ' + str(val[best])
     print 'Best parameter setting: ' + best + '; with average score: ' + str(averaged[best])
 
 

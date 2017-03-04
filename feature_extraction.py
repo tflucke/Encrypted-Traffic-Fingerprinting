@@ -10,17 +10,27 @@ from scipy.sparse import csr_matrix, vstack, hstack
 traffic_types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
 suffixes = ['','','_part','']
 path = 'traces/'
+path_ipsec = 'ipsec_traces/'
 object_file = 'traces/pickled_traces.dat'
+ipsec_object_file = 'ipsec_traces/pickled_traces.dat'
 BINS = 32
+IPsec = False
+ipsec_ip = '192.168.1.2'
+unencr_ip = '10.200.1.2'
 
 # Load all traces that match the reg exp
 def load_traces():
 	all_traces = []
 	for i in range(0,len(traffic_types)):
-		files = glob.glob(path+traffic_types[i]+'/'+traffic_types[i]+'_*'+suffixes[i]+'.pcap')
+		if not IPsec:
+			files = glob.glob(path+traffic_types[i]+'/'+traffic_types[i]+'_*'+suffixes[i]+'.pcap')
+			loc_ip = unencr_ip
+		else:
+			files = glob.glob(path_ipsec+traffic_types[i]+'/'+traffic_types[i]+'_*'+'.pcap')
+			loc_ip = ipsec_ip
 		for f in files:
 			print strftime("%H:%M:%S") +': ' + f
-			t = Trace()
+			t = Trace(loc_ip)
 			t.load_pcap(f,traffic_types[i])
 			all_traces.append(t)
 	return all_traces
@@ -145,7 +155,7 @@ def determine_histogram_edges_burst(traces):
 	return [[min_burst_size, max_burst_size], [min_burst_time, max_burst_time]]
 
 # Window all given traces
-def window_all_traces(traces, window_size = 1000):
+def window_all_traces(traces, window_size = 1024):
 	all_windowed = []
 	for trace in traces:
 		all_windowed.extend(trace.get_windowed(window_size = window_size))
@@ -154,15 +164,23 @@ def window_all_traces(traces, window_size = 1000):
 
 # Pickle the traces to avoid reading pcaps	
 def pickle_traces(traces):
-	with open(object_file, "wb") as f:
+	if IPsec:
+		o_file = ipsec_object_file
+	else:
+		o_file = object_file
+	with open(o_file, "wb") as f:
 	    pickle.dump(len(traces), f)
 	    for value in traces:
 	        pickle.dump(value, f)
 
 
-def load_pickled_traces():
+def load_pickled_traces(ipsec=False):
 	traces = []
-	with open(object_file, "rb") as f:
+	if ipsec:
+		o_file = ipsec_object_file
+	else:
+		o_file = object_file
+	with open(o_file, "rb") as f:
 		for _ in range(pickle.load(f)):
 			traces.append(pickle.load(f))
 	return traces
