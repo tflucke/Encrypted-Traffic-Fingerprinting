@@ -1,6 +1,7 @@
 from trace import *
 from feature_extraction import *
 import numpy as np
+import sys
 from time import strftime
 import matplotlib.pyplot as plt
 import numpy.random as nprnd
@@ -10,7 +11,12 @@ FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT' or 'burst')
 
 if __name__ == "__main__":
 	
-	all_traces = load_pickled_traces(ipsec=True)
+	mode = sys.argv[1]
+
+	if mode not in ['unencr','ipsec_ns','ipsec_def']:
+		sys.exit("Execute as: python trace_visualization.py 'mode' \n mode = unencr or ipsec_ns or ipsec_def")
+
+	all_traces = load_pickled_traces(load_mode=mode)
 	if FEATURE == 'size_IAT':
 		overall_range = determine_histogram_edges_size_IAT(all_traces)
 	elif FEATURE == 'burst':

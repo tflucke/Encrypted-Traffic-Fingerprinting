@@ -6,31 +6,40 @@ import numpy as np
 from math import log
 from time import strftime
 from scipy.sparse import csr_matrix, vstack, hstack
+import sys
 
 traffic_types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
-suffixes = ['','','_part','']
-path = 'traces/'
-path_ipsec = 'ipsec_traces/'
-object_file = 'traces/pickled_traces.dat'
-ipsec_object_file = 'ipsec_traces/pickled_traces.dat'
 BINS = 32
-IPsec = False
-ipsec_ip = '192.168.1.2'
-unencr_ip = '10.200.1.2'
+
+pars = {
+	'unencr':{
+		'path': 'traces/',
+		'object_file': 'traces/pickled_traces.dat',
+		'ip': '10.200.1.2'
+	},
+	'ipsec_ns':{
+		'path': 'ipsec_traces/',
+		'object_file': 'ipsec_traces/pickled_traces.dat',
+		'ip': '192.168.1.2'	
+	},
+	'ipsec_def':{
+		'path': 'ipsec_def_traces/',
+		'object_file': 'ipsec_def_traces/pickled_traces.dat',
+		'ip': '192.168.0.2'		
+	}
+}
+
+# Fill this in to determine which kind of traffic to work on
+mode = 'ipsec_ns'
 
 # Load all traces that match the reg exp
 def load_traces():
 	all_traces = []
 	for i in range(0,len(traffic_types)):
-		if not IPsec:
-			files = glob.glob(path+traffic_types[i]+'/'+traffic_types[i]+'_*'+suffixes[i]+'.pcap')
-			loc_ip = unencr_ip
-		else:
-			files = glob.glob(path_ipsec+traffic_types[i]+'/'+traffic_types[i]+'_*'+'.pcap')
-			loc_ip = ipsec_ip
+		files = glob.glob(pars[mode]['path']+traffic_types[i]+'/'+traffic_types[i]+'_*'+'.pcap')
 		for f in files:
 			print strftime("%H:%M:%S") +': ' + f
-			t = Trace(loc_ip)
+			t = Trace(pars[mode]['ip'])
 			t.load_pcap(f,traffic_types[i])
 			all_traces.append(t)
 	return all_traces
@@ -164,22 +173,17 @@ def window_all_traces(traces, window_size = 1024):
 
 # Pickle the traces to avoid reading pcaps	
 def pickle_traces(traces):
-	if IPsec:
-		o_file = ipsec_object_file
-	else:
-		o_file = object_file
+
+	o_file = pars[mode]['object_file']
 	with open(o_file, "wb") as f:
 	    pickle.dump(len(traces), f)
 	    for value in traces:
 	        pickle.dump(value, f)
 
 
-def load_pickled_traces(ipsec=False):
+def load_pickled_traces(load_mode=mode):
 	traces = []
-	if ipsec:
-		o_file = ipsec_object_file
-	else:
-		o_file = object_file
+	o_file = pars[load_mode]['object_file']
 	with open(o_file, "rb") as f:
 		for _ in range(pickle.load(f)):
 			traces.append(pickle.load(f))
