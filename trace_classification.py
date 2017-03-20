@@ -18,6 +18,7 @@ from sklearn.metrics import confusion_matrix
 FEATURE = 'both' # use burst features, size_IAT or both ('size_IAT', 'burst' or 'both')
 METHOD = 'MLP' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
+modes = ['unencr','ipsec_ns','ipsec_def','ipsec_20ps','ipsec_29ps','ipsec_40ps','ipsec_67ps','ipsec_100ps']
 
 def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
     """
@@ -80,9 +81,103 @@ if __name__ == "__main__":
              'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
              'LR': {'C': 100000, 'tol': 0.0001}}}
     elif mode =='ipsec_def':
-        pass
+        parameters = {'size_IAT' : 
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}},
+         'burst':
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}, 
+         'both': {
+             'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 12},
+             'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}}
+    elif mode =='ipsec_20ps':
+        parameters = {'size_IAT' : 
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 100, 'tol': 0.01}},
+         'burst':
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}, 
+         'both': {
+             'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 12},
+             'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}}
+    elif mode =='ipsec_29ps':
+        parameters = {'size_IAT' : 
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 10000, 'tol': 0.01}},
+         'burst':
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}, 
+         'both': {
+             'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 12},
+             'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}}
+    elif mode =='ipsec_40ps':
+        parameters = {'size_IAT' : 
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 10, 'tol': 0.0001}},
+         'burst':
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}, 
+         'both': {
+             'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 12},
+             'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}}             
+    elif mode =='ipsec_67ps':
+        parameters = {'size_IAT' : 
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}},
+         'burst':
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}, 
+         'both': {
+             'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 12},
+             'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}}
+    elif mode =='ipsec_100ps':
+        parameters = {'size_IAT' : 
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 10, 'tol': 0.0001}},
+         'burst':
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 15},
+             'MLP': {'alpha': 0.01, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}, 
+         'both': {
+             'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 12},
+             'MLP': {'alpha': 1.0000000000000001e-06, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}}    
     else:
-        sys.exit("Execute as: python trace_classification.py 'mode' \n mode = unencr or ipsec_ns or ipsec_def")
+        sys.exit("Execute as: python trace_classification.py 'mode' \n mode = " + str(modes))
     
     all_traces = load_pickled_traces(load_mode=mode)
     windowed_traces = window_all_traces(all_traces, window_size = 1024)

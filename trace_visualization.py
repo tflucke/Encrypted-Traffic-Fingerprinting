@@ -7,14 +7,14 @@ import matplotlib.pyplot as plt
 import numpy.random as nprnd
 
 FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT' or 'burst')
-
+modes = ['unencr','ipsec_ns','ipsec_def','ipsec_20ps','ipsec_29ps','ipsec_40ps','ipsec_67ps','ipsec_100ps']
 
 if __name__ == "__main__":
 	
 	mode = sys.argv[1]
 
-	if mode not in ['unencr','ipsec_ns','ipsec_def']:
-		sys.exit("Execute as: python trace_visualization.py 'mode' \n mode = unencr or ipsec_ns or ipsec_def")
+	if mode not in modes:
+		sys.exit("Execute as: python trace_visualization.py 'mode' \n mode = " + str(modes))
 
 	all_traces = load_pickled_traces(load_mode=mode)
 	if FEATURE == 'size_IAT':

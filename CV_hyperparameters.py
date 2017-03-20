@@ -11,11 +11,11 @@ from sklearn.model_selection import cross_val_score, KFold, train_test_split, Pa
 
 import itertools
 import matplotlib.pyplot as plt
-
+import sys
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'both' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
-METHOD = 'MLP' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+FEATURE = 'burst' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
+METHOD = 'LR' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 
 
@@ -25,7 +25,8 @@ def log(s):
 
 
 if __name__ == "__main__":
-    all_traces = load_pickled_traces(ipsec=True)
+    mode = sys.argv[1]
+    all_traces = load_pickled_traces(mode)
     windowed_traces = window_all_traces(all_traces)
 
     # Split test set
