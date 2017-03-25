@@ -10,7 +10,8 @@ import sys
 
 traffic_types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
 BINS = 32
-
+nan_hist =  np.empty((BINS,BINS), np.float64)
+nan_hist[:] = np.NAN
 pars = {
 	'unencr':{
 		'path': 'traces/',
@@ -137,6 +138,8 @@ def generate_histogram_burst(trace, fixed_range=None):
 	log_size = [np.sign(i)*log(abs(i)) for i in size]
 	log_time = [log(i) for i in time]
 	hist,x,y = np.histogram2d(log_size, log_time, bins = (BINS, BINS), normed = True, range= fixed_range)
+	if np.isnan(np.min(hist)):
+		hist[np.isnan(hist)] = 0
 	return hist, x,y
 
 # Generate a feature matrix with the 2D histogram data

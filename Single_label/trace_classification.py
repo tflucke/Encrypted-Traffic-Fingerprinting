@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'size_IAT' # use burst features, size_IAT or both ('size_IAT', 'burst' or 'both')
+FEATURE = 'burst' # use burst features, size_IAT or both ('size_IAT', 'burst' or 'both')
 METHOD = 'LR' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 modes = ['unencr','ipsec_ns','ipsec_def',
@@ -138,7 +138,7 @@ if __name__ == "__main__":
         parameters = {'size_IAT' : 
             {'LR': {'C': 100000, 'tol': 0.0001}},
          'burst':
-            {'LR': {'C': 100000, 'tol': 0.0001}}, 
+            {'LR': {'C': 10000, 'tol': 0.01}}, 
          'both': {'LR': {'C': 100000, 'tol': 0.0001}}}
     elif mode =='ipsec_20_ud' : 
         parameters = {'size_IAT' : 
@@ -178,7 +178,7 @@ if __name__ == "__main__":
          'both': {'LR': {'C': 100000, 'tol': 0.0001}}}
     elif mode =='ipsec_400_ud' : 
         parameters = {'size_IAT' : 
-            {'LR': {'C': 100, 'tol': 0.0001}},
+            {'LR': {'C': 100000, 'tol': 0.0001}},
          'burst':
             {'LR': {'C': 100000, 'tol': 0.0001}}, 
          'both': {'LR': {'C': 100000, 'tol': 0.0001}}} 
