@@ -24,7 +24,7 @@ class Trace():
 		self.labels = labels
 		trace = rdpcap(pathname)
 		trace = sorted(trace, key=lambda ts: ts.time)
-		for i in range(1, len(trace)):
+		for i in range(0, len(trace)):
 			if "IP" in trace[i]:
 				self.timestamps.append(trace[i].time)
 				if trace[i]['IP'].src == self.local_ip:

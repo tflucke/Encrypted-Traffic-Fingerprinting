@@ -10,17 +10,18 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import cross_val_score, KFold, train_test_split
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import hamming_loss
+from sklearn.metrics import hamming_loss, classification_report
 
 import itertools
 import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'burst' # use burst features, size_IAT or both ('size_IAT', 'burst' or 'both')
+FEATURE = 'both' # use burst features, size_IAT or both ('size_IAT', 'burst' or 'both')
 METHOD = 'RF' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
-modes = ['ipsec_ns']
+modes = ['ipsec']
+types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
 
 def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
     """
@@ -51,12 +52,12 @@ if __name__ == "__main__":
     mode = sys.argv[1]
 
     
-    if mode == 'ipsec_ns':
+    if mode == 'ipsec':
         parameters = {'size_IAT' : 
-            {'RF': {'n_estimators': 15}},
+            {'RF': {'n_estimators': 23}},
          'burst':
-            {'RF': {'n_estimators': 15}}, 
-         'both': {'RF': {'n_estimators': 12}}
+            {'RF': {'n_estimators': 17}}, 
+         'both': {'RF': {'n_estimators': 23}}
         }
     else:
         sys.exit("Execute as: python trace_classification.py 'mode' \n mode = " + str(modes))
@@ -85,13 +86,15 @@ if __name__ == "__main__":
         feature_matrix, classes, train_range = build_feature_matrix_both(X_train_val)
         feature_matrix_test, classes_test, test_range = build_feature_matrix_both(X_test, train_range)   
 
-    mlb = MultiLabelBinarizer(classes=['HTTP', 'Skype', 'Torrent', 'Youtube'])
+    mlb = MultiLabelBinarizer(classes=types)
     classes_bit = mlb.fit_transform(classes)
     classes_test_bit = mlb.fit_transform(classes_test)
 
     clf.fit(feature_matrix, classes_bit)
     predictions = clf.predict(feature_matrix_test)
     print hamming_loss(predictions, classes_test_bit)
+
+    print classification_report(classes_test_bit, predictions, target_names=types)
     
     # Compute confusion matrix
     #cnf_matrix = confusion_matrix(classes_test, clf.predict(feature_matrix_test))

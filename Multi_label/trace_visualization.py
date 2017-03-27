@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy.random as nprnd
 
 FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT' or 'burst')
-modes = ['unencr','ipsec_ns','ipsec_def','ipsec_20ps','ipsec_50ps','ipsec_100ps','ipsec_150ps','ipsec_200ps','ipsec_300ps','ipsec_400ps']
+modes = ['ipsec']
 
 if __name__ == "__main__":
 	
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 			X, Y = np.meshgrid(xedges, yedges)
 			plt.xlabel('log(packetsizes)')
 			plt.ylabel('log(IAT)')
-			plt.title(str(i.label) + '_full')
+			plt.title(str(i.labels) + '_full')
 			a = plt.pcolormesh(X, Y, H.transpose()[::-1])
 			plt.colorbar()
 			a.set_clim([0,0.6])
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 			X, Y = np.meshgrid(xedges, yedges)
 			plt.xlabel('log(burst size (bytes))')
 			plt.ylabel('log(burst time)')
-			plt.title(str(i.label) + '_full')
+			plt.title(str(i.labels) + '_full')
 			a = plt.pcolormesh(X, Y, H.transpose()[::-1])
 			plt.colorbar()
 			a.set_clim([0,0.6])
@@ -58,4 +58,28 @@ if __name__ == "__main__":
 	else:
 		print 'Not a valid feature space!'
 
-# Maybe add code to visualize random windows of unknown labeled traces
+	chosen = np.random.choice(windowed_traces, 20)
+
+	for i in chosen:
+		if FEATURE == 'size_IAT':
+			H, xedges, yedges = generate_histogram_size_IAT(i, overall_range)
+			X, Y = np.meshgrid(xedges, yedges)
+			plt.xlabel('log(packetsizes)')
+			plt.ylabel('log(IAT)')
+			plt.title(str(i.labels) + '_window')
+			a = plt.pcolormesh(X, Y, H.transpose()[::-1])
+			plt.colorbar()
+			a.set_clim([0,0.6])
+			plt.show()
+		elif FEATURE == 'burst':
+			H, xedges, yedges = generate_histogram_burst(i, overall_range)
+			X, Y = np.meshgrid(xedges, yedges)
+			plt.xlabel('log(burst size (bytes))')
+			plt.ylabel('log(burst time)')
+			plt.title(str(i.labels) + '_window')
+			a = plt.pcolormesh(X, Y, H.transpose()[::-1])
+			plt.colorbar()
+			a.set_clim([0,0.6])
+			plt.show()
+		else:
+			print 'Not a valid feature space!'

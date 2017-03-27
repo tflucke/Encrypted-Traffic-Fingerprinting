@@ -9,15 +9,15 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import cross_val_score, KFold, train_test_split, ParameterGrid
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import hamming_loss
+from sklearn.metrics import hamming_loss, classification_report
 
 import itertools
 import matplotlib.pyplot as plt
 import sys
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'burst' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
-METHOD = 'LR' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+FEATURE = 'both' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
+METHOD = 'RF' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
 
     clf = RandomForestClassifier(random_state = 0)
-    parameters = ParameterGrid({'n_estimators': range(5,16)})
+    parameters = ParameterGrid({'n_estimators': range(5,25)})
 
 
     results = [{},{},{},{}]
@@ -68,7 +68,7 @@ if __name__ == "__main__":
             clf.fit(feature_matrix, classes_bit)
             predictions = clf.predict(feature_matrix_val)
             loss = hamming_loss(predictions, classes_val_bit)
-            results[fold][str(par)] = prec
+            results[fold][str(par)] = loss
 
         fold +=1
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     best = min(averaged, key=averaged.get)
 
     for idx, val in enumerate(results):
-        print 'fold: ' + str(idx+1) +'; score: ' + str(val[best])
+        print 'fold: ' + str(idx+1) +'; loss: ' + str(val[best])
     print 'Best parameter setting: ' + best + '; with average loss: ' + str(averaged[best])
 
 

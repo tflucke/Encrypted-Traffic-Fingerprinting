@@ -16,7 +16,7 @@ pars = {
 	'ipsec':{
 		'path': 'ipsec_traces/',
 		'object_file': 'ipsec_traces/pickled_traces.dat',
-		'ip': '192.168.1.2'	
+		'ip': '192.168.0.2'	
 	}
 }
 
@@ -32,6 +32,7 @@ def load_traces():
 		start_index = f.rfind('/')
 		stop_index = f.rfind('.')
 		labels = f[start_index+1:stop_index].split('_')
+		labels = [x for x in labels if x in traffic_types]
 		t = Trace(pars[mode]['ip'])
 		t.load_pcap(f,labels)
 		all_traces.append(t)
