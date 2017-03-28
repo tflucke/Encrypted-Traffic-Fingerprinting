@@ -10,10 +10,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import cross_val_score, KFold, train_test_split
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import hamming_loss, classification_report
+from sklearn.metrics import hamming_loss, classification_report, accuracy_score
 
 import itertools
-import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix
 
@@ -22,31 +21,6 @@ METHOD = 'RF' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR
 TEST_SIZE = 0.20
 modes = ['ipsec']
 types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
-
-def plot_confusion_matrix(cm, classes, title='Confusion matrix', cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    """
-    
-    cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
-
-
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, '{0:.2f}'.format(cm[i, j]),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
-    #plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
 
 if __name__ == "__main__":
     mode = sys.argv[1]
@@ -71,7 +45,7 @@ if __name__ == "__main__":
     #print X_train_val, y_train_val, X_test, y_test
     # Use parameters as obtained from CV_hyperparameters
 
-    clf = RandomForestClassifier()
+    clf = RandomForestClassifier(random_state=10)
     
     # Set parameters
     clf.set_params(**parameters[FEATURE][METHOD])
@@ -92,16 +66,7 @@ if __name__ == "__main__":
 
     clf.fit(feature_matrix, classes_bit)
     predictions = clf.predict(feature_matrix_test)
-    print hamming_loss(predictions, classes_test_bit)
-
+    print 'Hamming loss:' + str(hamming_loss(predictions, classes_test_bit))
+    print 'Subset accuracy: ' +str(accuracy_score(predictions, classes_test_bit))
+    print 'Classification report: '
     print classification_report(classes_test_bit, predictions, target_names=types)
-    
-    # Compute confusion matrix
-    #cnf_matrix = confusion_matrix(classes_test, clf.predict(feature_matrix_test))
-    #np.set_printoptions(precision=2)
-    
-    # Plot normalized confusion matrix    
-    #plt.figure()
-    #plot_confusion_matrix(cnf_matrix, classes=traffic_types, title='Normalized confusion matrix')
-
-    #plt.show()

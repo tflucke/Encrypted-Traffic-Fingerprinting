@@ -36,7 +36,7 @@ if __name__ == "__main__":
     X_train_val, X_test, y_train_val, y_test = train_test_split(windowed_traces,labels, test_size=TEST_SIZE, random_state=0)
 
 
-    clf = RandomForestClassifier(random_state = 0)
+    clf = RandomForestClassifier(random_state = 10)
     parameters = ParameterGrid({'n_estimators': range(5,25)})
 
 
