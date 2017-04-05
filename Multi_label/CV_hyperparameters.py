@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import sys
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'both' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
+FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
 METHOD = 'RF' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 
@@ -33,11 +33,12 @@ if __name__ == "__main__":
 
     # Split test set
     labels = [x.labels for x in windowed_traces]
-    X_train_val, X_test, y_train_val, y_test = train_test_split(windowed_traces,labels, test_size=TEST_SIZE, random_state=0)
+    multi_single = [len(x) for x in labels]
+    X_train_val, X_test, y_train_val, y_test = train_test_split(windowed_traces,labels, stratify=multi_single, test_size=TEST_SIZE, random_state=0)
 
 
-    clf = RandomForestClassifier(random_state = 10)
-    parameters = ParameterGrid({'n_estimators': range(5,25)})
+    clf = RandomForestClassifier(random_state = 0)
+    parameters = ParameterGrid({'n_estimators': range(15,50)})
 
 
     results = [{},{},{},{}]

@@ -17,11 +17,41 @@ pars = {
 		'path': 'ipsec_traces/',
 		'object_file': 'ipsec_traces/pickled_traces.dat',
 		'ip': '192.168.0.2'	
+	},
+	'ipsec_20':{
+		'path': 'ipsec_20/',
+		'object_file': 'ipsec_20/pickled_traces.dat',
+		'ip': '192.168.0.2'	
+	},
+	'ipsec_50':{
+		'path': 'ipsec_50/',
+		'object_file': 'ipsec_50/pickled_traces.dat',
+		'ip': '192.168.0.2'	
+	},
+	'ipsec_100':{
+		'path': 'ipsec_100/',
+		'object_file': 'ipsec_100/pickled_traces.dat',
+		'ip': '192.168.0.2'	
+	},
+	'ipsec_200':{
+		'path': 'ipsec_200/',
+		'object_file': 'ipsec_200/pickled_traces.dat',
+		'ip': '192.168.0.2'	
+	},
+	'ipsec_300':{
+		'path': 'ipsec_300/',
+		'object_file': 'ipsec_300/pickled_traces.dat',
+		'ip': '192.168.0.2'	
+	},
+	'ipsec_400':{
+		'path': 'ipsec_400/',
+		'object_file': 'ipsec_400/pickled_traces.dat',
+		'ip': '192.168.0.2'	
 	}
 }
 
 # Fill this in to determine which kind of traffic to work on
-mode = 'ipsec'
+mode = 'ipsec_400'
 
 # Load all traces that match the reg exp
 def load_traces():

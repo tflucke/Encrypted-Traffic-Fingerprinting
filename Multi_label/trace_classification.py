@@ -16,10 +16,10 @@ import itertools
 
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'both' # use burst features, size_IAT or both ('size_IAT', 'burst' or 'both')
+FEATURE = 'size_IAT' # use burst features, size_IAT or both ('size_IAT', 'burst' or 'both')
 METHOD = 'RF' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
-modes = ['ipsec']
+modes = ['ipsec', 'ipsec_20','ipsec_50','ipsec_100','ipsec_200','ipsec_300','ipsec_400']
 types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
 
 if __name__ == "__main__":
@@ -28,10 +28,34 @@ if __name__ == "__main__":
     
     if mode == 'ipsec':
         parameters = {'size_IAT' : 
-            {'RF': {'n_estimators': 23}},
+            {'RF': {'n_estimators': 48}},
          'burst':
-            {'RF': {'n_estimators': 17}}, 
-         'both': {'RF': {'n_estimators': 23}}
+            {'RF': {'n_estimators': 21}}, 
+         'both': {'RF': {'n_estimators': 21}}
+        }
+    elif mode == 'ipsec_20':
+        parameters = {'size_IAT' : 
+            {'RF': {'n_estimators': 49}}
+        }
+    elif mode == 'ipsec_50':
+        parameters = {'size_IAT' : 
+            {'RF': {'n_estimators': 46}}
+        }
+    elif mode == 'ipsec_100':
+        parameters = {'size_IAT' : 
+            {'RF': {'n_estimators': 45}}
+        }
+    elif mode == 'ipsec_200':
+        parameters = {'size_IAT' : 
+            {'RF': {'n_estimators': 49}}
+        }
+    elif mode == 'ipsec_300':
+        parameters = {'size_IAT' : 
+            {'RF': {'n_estimators': 48}}
+        }
+    elif mode == 'ipsec_400':
+        parameters = {'size_IAT' : 
+            {'RF': {'n_estimators': 48}}
         }
     else:
         sys.exit("Execute as: python trace_classification.py 'mode' \n mode = " + str(modes))
@@ -41,11 +65,12 @@ if __name__ == "__main__":
 
     # Split test set
     labels = [x.labels for x in windowed_traces]
-    X_train_val, X_test, y_train_val, y_test = train_test_split(windowed_traces,labels, test_size=TEST_SIZE, random_state=0)
+    multi_single = [len(x) for x in labels]
+    X_train_val, X_test, y_train_val, y_test = train_test_split(windowed_traces, labels, stratify=multi_single, test_size=TEST_SIZE, random_state=0)
     #print X_train_val, y_train_val, X_test, y_test
     # Use parameters as obtained from CV_hyperparameters
 
-    clf = RandomForestClassifier(random_state=10)
+    clf = RandomForestClassifier(random_state=0)
     
     # Set parameters
     clf.set_params(**parameters[FEATURE][METHOD])
@@ -70,3 +95,7 @@ if __name__ == "__main__":
     print 'Subset accuracy: ' +str(accuracy_score(predictions, classes_test_bit))
     print 'Classification report: '
     print classification_report(classes_test_bit, predictions, target_names=types)
+    # c = {1:0,2:0,3:0,4:0}
+    # for x in predictions:
+    #     c[x.sum()]+=1
+    # print c

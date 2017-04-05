@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import sys
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'burst' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
-METHOD = 'LR' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
+METHOD = 'RF' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         parameters = ParameterGrid({'alpha': np.logspace(-5.0, 5.0, num=11)})
     elif METHOD == 'RF':
         clf = RandomForestClassifier(random_state = 0)
-        parameters = ParameterGrid({'n_estimators': range(5,16)})
+        parameters = ParameterGrid({'n_estimators': range(10,25)})
     elif METHOD == 'MLP':
         clf = MLPClassifier(solver = 'sgd', learning_rate = 'adaptive', random_state = 0)
         parameters = ParameterGrid({'alpha': np.logspace(-6.0, -2.0, num=5), 'max_iter' : [100,200,300], 'hidden_layer_sizes' : [(100,),(100,100),(100,100,100)]})
