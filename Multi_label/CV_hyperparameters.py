@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import sys
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
+FEATURE = 'both' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
 METHOD = 'RF' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 

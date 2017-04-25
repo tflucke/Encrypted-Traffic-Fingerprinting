@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy.random as nprnd
 
 FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT' or 'burst')
-modes = ['unencr','ipsec_ns','ipsec_def','ipsec_20ps','ipsec_50ps','ipsec_100ps','ipsec_150ps','ipsec_200ps','ipsec_300ps','ipsec_400ps']
+modes = ['tor','unencr','ipsec_ns','ipsec_def','ipsec_20ps','ipsec_50ps','ipsec_100ps','ipsec_150ps','ipsec_200ps','ipsec_300ps','ipsec_400ps','ipsec_20_ud','ipsec_50_ud','ipsec_100_ud','ipsec_150_ud','ipsec_200_ud','ipsec_300_ud','ipsec_400_ud']
 
 if __name__ == "__main__":
 	

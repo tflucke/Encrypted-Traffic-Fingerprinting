@@ -30,8 +30,8 @@ if __name__ == "__main__":
         parameters = {'size_IAT' : 
             {'RF': {'n_estimators': 48}},
          'burst':
-            {'RF': {'n_estimators': 21}}, 
-         'both': {'RF': {'n_estimators': 21}}
+            {'RF': {'n_estimators': 48}}, 
+         'both': {'RF': {'n_estimators': 39}}
         }
     elif mode == 'ipsec_20':
         parameters = {'size_IAT' : 

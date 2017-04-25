@@ -97,11 +97,16 @@ pars = {
 		'path': 'traces_400_ud/',
 		'object_file': 'traces_400_ud/pickled_traces.dat',
 		'ip': '192.168.0.2'		
+	},
+	'tor':{
+		'path': 'tor_traces/',
+		'object_file': 'tor_traces/pickled_traces.dat',
+		'ip': '192.168.2.2'		
 	}
 }
 
 # Fill this in to determine which kind of traffic to work on
-mode = 'ipsec_400_ud'
+mode = 'tor'
 
 # Load all traces that match the reg exp
 def load_traces():

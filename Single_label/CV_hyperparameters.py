@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import sys
 from sklearn.metrics import confusion_matrix
 
-FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
-METHOD = 'RF' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+#FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
+#METHOD = 'LR' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
 TEST_SIZE = 0.20
 
 
@@ -26,13 +26,16 @@ def log(s):
 
 if __name__ == "__main__":
     mode = sys.argv[1]
+    FEATURE = sys.argv[2] # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
+    METHOD = sys.argv[3] # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
     all_traces = load_pickled_traces(mode)
-    windowed_traces = window_all_traces(all_traces)
+    #windowed_traces = window_all_traces(all_traces)
 
-    # Split test set
-    labels = [x.label for x in windowed_traces]
-    X_train_val, X_test, y_train_val, y_test = train_test_split(windowed_traces,labels, stratify=np.array(labels), test_size=TEST_SIZE, random_state=0)
+    # Split test set but keep windows from different traces seperated from eachother
+    labels = [x.label for x in all_traces]
+    X_train_val, X_test, y_train_val, y_test = train_test_split(all_traces,labels, stratify=np.array(labels), test_size=TEST_SIZE, random_state=0)
 
+    X_train_val = window_all_traces(X_train_val)
 
     if METHOD == 'NB':
         clf = MultinomialNB()
@@ -53,8 +56,8 @@ if __name__ == "__main__":
     for train, val in kf.split(X_train_val):
         log('Started testing hyperparameters for fold ' + str(fold+1)+'.')
         # Seperate train list from val list
-        train_list = [windowed_traces[i] for i in train]
-        val_list = [windowed_traces[i] for i in val]
+        train_list = [X_train_val[i] for i in train]
+        val_list = [X_train_val[i] for i in val]
 
         if FEATURE == 'size_IAT':
             feature_matrix, classes, train_range = build_feature_matrix_size_IAT(train_list)
@@ -63,7 +66,7 @@ if __name__ == "__main__":
             feature_matrix, classes, train_range = build_feature_matrix_burst(train_list)
             feature_matrix_val, classes_val, val_range = build_feature_matrix_burst(val_list, train_range)
         elif FEATURE == 'both':
-            feature_matrix, classes, train_range = build_feature_matrix_both(X_train_val)
+            feature_matrix, classes, train_range = build_feature_matrix_both(train_list)
             feature_matrix_val, classes_val, val_range = build_feature_matrix_both(val_list, train_range)  
 
         for par in list(parameters):

@@ -6,7 +6,7 @@ from time import strftime
 import matplotlib.pyplot as plt
 import numpy.random as nprnd
 
-FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT' or 'burst')
+FEATURE = 'burst' # use burst features or size_IAT ('size_IAT' or 'burst')
 modes = ['ipsec', 'ipsec_20','ipsec_50','ipsec_100','ipsec_200','ipsec_300','ipsec_400']
 
 if __name__ == "__main__":
