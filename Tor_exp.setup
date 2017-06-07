@@ -1,0 +1,82 @@
+experiment with 3 Nodes:
+
+-Router
+-Gateway
+-Workstation
+
+### Route traffic from Gateway through Router ###
+
+1. Make Router able to use NAT'ed IPv4 traffic
+
+commands on Router:
+
+	sudo route del default gw 10.2.47.254 && sudo route add default gw 10.2.47.253
+	sudo route add -net 10.11.0.0 netmask 255.255.0.0 gw 10.2.47.254
+	sudo route add -net 10.2.0.0 netmask 255.255.240.0 gw 10.2.47.254
+
+2. Make Router able to forward IPv4 packets
+
+commands on Router:
+
+	sudo nano /etc/sysctl.conf
+
+	Add/uncomment/change to:
+		
+		net.ipv4.ip_forward=1
+
+	sudo sysctl -p
+
+3. Make Router the default gateway for Gateway
+
+commands on Gateway:
+
+	sudo route del default gw 10.2.47.254 && sudo route add default gw 192.168.2.1
+
+4. Delete IPv4 address from control interface of Gateway (just to be sure)
+
+commands on Router:
+
+	sudo ip addr del 10.2.33.226 dev eno1
+
+5. Enable the Router to NAT incomming traffic from 192.168.2/24
+
+commands on Router:
+	
+	sudo iptables -t nat -A POSTROUTING -o eno1 -s 192.168.2/24 -j MASQUERADE
+
+
+### The actual isolation proxy setup ###
+
+1. Delete the IPv4 address from the control interface of the Workstation (The workstation should be completely isolated from the public net, but due to the VW environement this is not possible)
+
+commands on Workstation:
+	
+	sudo ip addr del 10.2.33.222 dev eno1
+
+2. Install tor on the Gateway
+
+commands on the Gateway:
+
+	see https://www.torproject.org/docs/debian.html.en#ubuntu
+
+3. Start Tor on the Gateway
+
+	commands on Gateway:
+		sudo /etc/init.d/tor restart
+		tor
+
+4. Set the default gateway and the DNS server on the Workstation to Gateway
+
+	commands on Workstation:
+
+		sudo nano /etc/resolv.conf
+
+		Add/uncomment/change to:
+		
+			nameserver 192.168.1.1
+
+		sudo route add default gw 192.168.1.1
+
+5. Use the Tor proxy for all connections on the Workstation
+
+	enabling applications to use socks proxy

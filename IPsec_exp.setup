@@ -1,0 +1,162 @@
+GOAL: Route all traffic from 'Client' through 'Server'
+
+APPROACH:
+
+1. Enable ipv4 forwarding on the server
+
+sudo nano /etc/sysctl.conf
+
+Add/uncomment/change to:
+	
+	net.ipv4.ip_forward=1
+
+sudo sysctl -p
+
+2. Enable NAT'ed IPv4 internet access on the server
+
+sudo route del default gw 10.2.15.254 && sudo route add default gw 10.2.15.253
+sudo route add -net 10.11.0.0 netmask 255.255.0.0 gw 10.2.15.254
+sudo route add -net 10.2.32.0 netmask 255.255.240.0 gw 10.2.15.254
+
+3. Disable ipv4 on the enp1s5f0 interface of the client
+
+sudo ip addr del 10.2.0.134 dev enp1s5f0
+
+4. Add default route on client
+
+sudo ip route add default via 192.168.0.1 dev enp1s5f1
+
+5. Enable NAT on server
+
+sudo iptables -t nat -A POSTROUTING -o enp1s5f0 -s 192.168/16 -j MASQUERADE
+
+YAY, internet acces from the client node through the server node!
+
+
+---------------------------------------------------------------
+
+
+NEXT GOAL: Add an IPv4 network namespace to the client and fix internet connectivity from the namespace
+
+APPROACH:
+
+1. Delete network namespace ns1, and the link to it, if these already exist
+
+sudo ip netns del ns1 &>/dev/null
+
+2. Create the namespace
+
+sudo ip netns add ns1
+
+3. Create a veth pair to link the ns1 namespace to the default
+
+sudo ip link add v-eth1 type veth peer name v-peer1
+sudo ip link set v-peer1 netns ns1
+
+4. Setup IPv4 addresses for both interfaces and bring them up
+
+sudo ip addr add 192.168.1.1/24 dev v-eth1
+sudo ip link set v-eth1 up
+
+sudo ip netns exec ns1 ip addr add 192.168.1.2/24 dev v-peer1
+sudo ip netns exec ns1 ip link set v-peer1 up
+sudo ip netns exec ns1 ip link set lo up
+
+5. Route all traffic from the ns1 namespace through the default namespace
+
+sudo ip netns exec ns1 ip route add default via 192.168.1.1
+
+6. Enable forwarding to route traffic from the namespace to the internet and back.
+
+sudo nano /etc/sysctl.conf
+
+Add/uncomment/change to:
+	
+	net.ipv4.ip_forward=1
+
+	net.ipv4.conf.all.send_redirects = 0
+
+	net.ipv4.conf.all.accept_source_route = 0
+
+	net.ipv4.conf.all.accept_redirects = 0
+
+sudo sysctl -p
+
+7. Enable forwarding between interfaces
+
+sudo iptables -P FORWARD DROP
+sudo iptables -F FORWARD
+
+sudo iptables -A FORWARD -i enp1s5f1 -o v-eth1 -j ACCEPT
+sudo iptables -A FORWARD -o enp1s5f1 -i v-eth1 -j ACCEPT
+
+8. Add route on server to the ns1 namespace
+
+sudo ip route add 192.168/16 via 192.168.0.1 dev enp1s5f1
+
+YAY, internet acces from the ns1 namespace!
+
+
+---------------------------------------------------------------
+
+
+NEXT GOAL: Encrypt all traffic from the network namespace to the 'Server'-node, using IPsec.
+
+APPROACH:
+
+0. If the needed packages are not installed, install them on both the server and the client.
+
+sudo apt-get install ipsec-tools strongswan-starter
+
+1. Add PSK credentials to both server and client secrets files
+
+sudo nano /etc/ipsec.secrets
+
+add this to the files:
+	%any : PSK "password"
+
+3. Edit the ipsec configuration files on the server
+
+sudo nano /etc/ipsec.conf
+
+add the follwing connection:
+	
+	conn my-tunnel
+        authby=secret
+        auto=route
+        keyexchange=ike
+        left=192.168.0.1
+        right=192.168.1.2
+        leftsubnet=0.0.0.0/0
+        type=tunnel
+        leftfirewall=yes
+        rightfirewall=yes
+
+
+4. Edit the ipsec configuration files on the client
+
+sudo nano /etc/ipsec.conf
+
+add the follwing connection:
+
+	conn my-tunnel
+        authby=secret
+        auto=route
+        keyexchange=ike
+        left=192.168.1.2
+        right=192.168.0.1
+        rightsubnet=0.0.0.0/0
+        type=tunnel
+        leftfirewall=yes
+        rightfirewall=yes
+
+
+5. Start the IPsec service on the server
+
+sudo ipsec start
+
+6. Start the IPsec service in the ns1 network namespace of the client
+
+sudo ip netns exec ns1 ipsec start
+
+YAY, you now have an IPsec connection between the ns1 network namespace and the server!
