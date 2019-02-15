@@ -1,0 +1,8 @@
+Results with existing samples are better than reported in paper.
+ * Somewhere between 1-7%
+ * Program seems deterministic, so unlikely due to RNG
+ * Does vary slightly (~1-2%) by computer.  Maybe be attributable to floating point error or library compilations.
+ * Possible newer versions of libraries are optimized to perform better
+In the paper some of the numbers don't quite add up
+ * The confusion matrix has columns with sum to greater than 1.
+ * Possibly just types/copypasta

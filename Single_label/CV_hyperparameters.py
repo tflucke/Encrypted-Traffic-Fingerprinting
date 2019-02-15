@@ -24,8 +24,9 @@ def log(s):
     print '[INFO] ' + s
 
 
+# Example usage: python2 CV_hyerparameters.py tor burst LR
 if __name__ == "__main__":
-    mode = sys.argv[1]
+    mode = sys.argv[1] # Type of data to test
     FEATURE = sys.argv[2] # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
     METHOD = sys.argv[3] # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
     all_traces = load_pickled_traces(mode)
@@ -78,6 +79,7 @@ if __name__ == "__main__":
         fold +=1
 
     N = float(len(results))
+    # For each parameter value, take the average output from each fold
     averaged = { k : sum(t[k] for t in results)/N for k in results[0] }
 
     best = max(averaged, key=averaged.get)
@@ -85,11 +87,3 @@ if __name__ == "__main__":
     for idx, val in enumerate(results):
         print 'fold: ' + str(idx+1) +'; score: ' + str(val[best])
     print 'Best parameter setting: ' + best + '; with average score: ' + str(averaged[best])
-
-
-
-
-
-
-
-
