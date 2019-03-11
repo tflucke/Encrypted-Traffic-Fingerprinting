@@ -8,7 +8,8 @@ from time import strftime
 from scipy.sparse import csr_matrix, vstack, hstack
 import sys
 
-traffic_types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
+# traffic_types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
+traffic_types = ['HTTP', 'SSH', 'CrossFire', 'Youtube']
 BINS = 32
 nan_hist =  np.empty((BINS,BINS), np.float64)
 nan_hist[:] = np.NAN
@@ -101,7 +102,8 @@ pars = {
 	'tor':{
 		'path': 'tor_traces/',
 		'object_file': 'tor_traces/pickled_traces.dat',
-		'ip': '192.168.2.2'		
+		#'ip': '192.168.2 .2'
+                'ip': '10.0.2.15' # IP address of virtual machine
 	}
 }
 
@@ -250,18 +252,19 @@ def window_all_traces(traces, window_size = 1024):
 	return all_windowed
 
 # Pickle the traces to avoid reading pcaps	
-def pickle_traces(traces):
-
-	o_file = pars[mode]['object_file']
+def pickle_traces(traces, o_file=None):
+        if o_file is None:
+		o_file = pars[load_mode]['object_file']
 	with open(o_file, "wb") as f:
 	    pickle.dump(len(traces), f)
 	    for value in traces:
 	        pickle.dump(value, f)
 
 
-def load_pickled_traces(load_mode=mode):
+def load_pickled_traces(load_mode=mode, o_file=None):
 	traces = []
-	o_file = pars[load_mode]['object_file']
+        if o_file is None:
+		o_file = pars[load_mode]['object_file']
 	with open(o_file, "rb") as f:
 		for _ in range(pickle.load(f)):
 			traces.append(pickle.load(f))
