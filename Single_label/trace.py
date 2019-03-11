@@ -22,15 +22,18 @@ class Trace():
 
 	def load_pcap(self, pathname, label):
 		self.label = label
+                print "Reading pcap..."
 		trace = rdpcap(pathname)
+                print "Sorting pcap..."
 		trace = sorted(trace, key=lambda ts: ts.time)
-		for i in range(0, len(trace)):
-			if "IP" in trace[i]:
-				self.timestamps.append(trace[i].time)
-				if trace[i]['IP'].src == self.local_ip:
-					self.packetsizes.append(len(trace[i]))
+                print "Processing packets..."
+		for p in trace:
+			if "IP" in p:
+				self.timestamps.append(p.time)
+				if p['IP'].src == self.local_ip:
+					self.packetsizes.append(len(p))
 				else:
-					self.packetsizes.append(-1*len(trace[i]))
+					self.packetsizes.append(-1*len(p))
 		self.num_packets = len(self.packetsizes)
 
 	def construct_trace(self, packets, times, label):
