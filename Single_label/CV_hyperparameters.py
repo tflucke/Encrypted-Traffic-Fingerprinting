@@ -32,6 +32,7 @@ if __name__ == "__main__":
     METHOD = sys.argv[3] # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
     if len(sys.argv) > 4:
         all_traces = load_pickled_traces(mode, sys.argv[4])
+        # for t in all_traces: print t.label
     else:
         all_traces = load_pickled_traces(mode)
     #windowed_traces = window_all_traces(all_traces)
