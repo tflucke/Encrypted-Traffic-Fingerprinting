@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 from trace import *
 from feature_extraction import *
 import numpy as np
@@ -29,7 +30,10 @@ if __name__ == "__main__":
     mode = sys.argv[1] # Type of data to test
     FEATURE = sys.argv[2] # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
     METHOD = sys.argv[3] # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
-    all_traces = load_pickled_traces(mode)
+    if len(sys.argv) > 4:
+        all_traces = load_pickled_traces(mode, sys.argv[4])
+    else:
+        all_traces = load_pickled_traces(mode)
     #windowed_traces = window_all_traces(all_traces)
 
     # Split test set but keep windows from different traces seperated from eachother
