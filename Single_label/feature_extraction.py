@@ -9,7 +9,7 @@ from scipy.sparse import csr_matrix, vstack, hstack
 import sys
 
 # traffic_types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
-traffic_types = ['HTTP', 'SSH', 'CrossFire', 'Youtube']
+traffic_types = ['HTTP', 'SSH', 'Dominion', 'Youtube']
 BINS = 32
 nan_hist =  np.empty((BINS,BINS), np.float64)
 nan_hist[:] = np.NAN

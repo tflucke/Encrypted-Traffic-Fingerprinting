@@ -22,11 +22,11 @@ class Trace():
 
 	def load_pcap(self, pathname, label):
 		self.label = label
-                print "Reading pcap..."
+                #print "Reading pcap..."
 		trace = rdpcap(pathname)
-                print "Sorting pcap..."
+                #print "Sorting pcap..."
 		trace = sorted(trace, key=lambda ts: ts.time)
-                print "Processing packets..."
+                #print "Processing packets..."
 		for p in trace:
 			if "IP" in p:
 				self.timestamps.append(p.time)
