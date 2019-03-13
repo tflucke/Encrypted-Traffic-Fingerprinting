@@ -266,6 +266,32 @@ def load_pickled_traces(load_mode=mode, o_file=None):
         if o_file is None:
 		o_file = pars[load_mode]['object_file']
 	with open(o_file, "rb") as f:
+                # The first pickled object represents the total number of objects.
 		for _ in range(pickle.load(f)):
 			traces.append(pickle.load(f))
 	return traces
+
+def consolidate_traces(traces):
+    """
+    Consolidates a list of traces into a smaller list of in which each trace
+    has a different label.
+
+    @param traces: The list of traces to consolidate.
+    """
+    consolidated = {}
+
+    for t in traces:
+        if t.label in consolidated:
+            packets = consolidated[t.label].get_packetsizes() + t.get_packetsizes()
+            sizes = consolidated[t.label].get_timestamps() + t.get_timestamps()
+            new_trace = Trace()
+            new_trace.construct_trace(packets, sizes, t.label)
+            consolidated[t.label] = new_trace
+        else:
+            consolidated[t.label] = t
+
+    for key in consolidated:
+        consolidated[key].packetsizes = sorted(consolidated[key].get_packetsizes())
+        consolidated[key].timestamps = sorted(consolidated[key].get_timestamps())
+
+    return [v for _, v in consolidated.items()]
