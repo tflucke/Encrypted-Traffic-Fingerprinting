@@ -49,7 +49,7 @@ class Trace():
 		return self.packetsizes
 
 	# Get the IAT array of a trace
-	def get_IAT(self):
+	def get_fake_IAT(self):
 		IAT = [self.epsilon]
 		for x in range(1, self.num_packets):
 			t = self.timestamps[x]-self.timestamps[x-1]
@@ -57,6 +57,22 @@ class Trace():
 				IAT.append(t)
 			else:
 				IAT.append(self.epsilon)
+		return IAT
+        
+	# Get the IAT array of a trace
+	def get_IAT(self):
+                sign = lambda x: x and (1, -1)[x < 0]
+		IAT = []
+		for x in range(0, self.num_packets):
+                        y = x + 1
+                        while y < self.num_packets and \
+                              sign(self.packetsizes[x]) != sign(self.packetsizes[y]):
+                                y = y + 1
+			if y < self.num_packets and \
+                           self.timestamps[y] != self.timestamps[x]:
+				IAT.append(self.timestamps[y] - self.timestamps[x])
+                        else:
+                                IAT.append(self.epsilon)
 		return IAT
 	
 	# Get the burst size (bytes) and times arrays of a trace
