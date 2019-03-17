@@ -320,7 +320,20 @@ def determine_histogram_edges(feature, traces):
     """
 
     if feature == 'size_IAT':
-        raise NotImplementedError
+        all_IAT_values = [x.get_IAT() for x in traces]
+        all_size_values = [x.get_packetsizes() for x in traces]
+
+        # Get min and max IATs.
+        IATs = [item for sublist in all_IAT_values for item in sublist]
+        min_y = log(np.amin(IATs))
+        max_y = log(np.amax(IATs))
+
+        # Get min and max packet sizes.
+        sizes = [item for sublist in all_size_values for item in sublist]
+        min_size_temp = log(abs(np.amin(sizes))) #FIXME necessary?
+        max_size_temp = log(abs(np.amax(sizes)))
+        min_x = -1*np.max([min_size_temp, max_size_temp])
+        max_x = np.max([min_size_temp, max_size_temp])
 
     elif feature == 'burst':
         all_burst_size_values = []
@@ -350,8 +363,8 @@ def determine_histogram_edges(feature, traces):
         max_x = log(np.amax(rtts)) # Find maximum RTT among all traces.
 
         # Min and max of services will be 1 to len(rtts) + 1
-        min_y = 1
-        max_y = len(rtts) + 1
+        min_y = 0
+        max_y = log(1000)
 
     else:
         raise ValueError("Invalid feature: {}".format(feature))
