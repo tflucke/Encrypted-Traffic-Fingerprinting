@@ -149,6 +149,72 @@ def generate_histogram_burst(trace, fixed_range=None):
 		hist[np.isnan(hist)] = 0
 	return hist, x,y
 
+def generate_histogram(feature, trace, fixed_range=None):
+    """
+    Generates histograms of the specified type.
+
+    @param feature: May be 'size_IAT, burst, or rtt.
+    @param trace: The trace to operate on.
+    @param fixed_range: A fixed range. Defaults to None.
+    """
+    if feature == 'size_IAT':
+        log_packetsize = [np.sign(i)*log(abs(i)) for i in trace.packetsizes]
+        log_IAT = [log(i) for i in trace.get_IAT()]
+        hist, x, y = np.histogram2d(log_packetsize, log_IAT, bins=(BINS, BINS),
+                                    normed=True, range=fixed_range)
+    if feature == 'burst':
+        size, time = trace.get_burst_info()
+        log_size = [np.sign(i)*log(abs(i)) for i in size]
+        log_time = [log(i) for i in time]
+        hist, x, y = np.histogram2d(log_size, log_time, bins=(BINS, BINS),
+                                    normed=True, range=fixed_range)
+        if np.isnan(np.min(hist)):
+            hist[np.isnan(hist)] = 0
+    if feature == 'rtt':
+        log_rtt = [log(rtt.rtt) for rtt in trace.rtts]
+        log_serv = [log(i) for i in range(1, len(log_rtt) + 1)]
+        hist, x, y = np.histogram2d(log_serv, log_rtt, bins=(BINS, BINS),
+                                    normed=True, range=fixed_range)
+        if np.isnan(np.min(hist)):
+            hist[np.isnan(hist)] = 0
+
+    return hist, x, y
+
+def build_feature_matrix(feature, traces, given_range=None):
+    """
+    Builds a feature matrix.
+
+    @param feature: The feature to use. May be 'size_IAT', 'burst', 'rtt', or 'all'.
+    @param traces: A list of Trace objects.
+    @param given_range: A predefined range. Defaults to None.
+    """
+    fixed_range = given_range
+    classes = []
+    feature_matrix = None
+
+    if feature == 'size_IAT':
+        raise NotImplementedError
+    elif feature == 'burst':
+        raise NotImplementedError
+    elif feature == 'rtt':
+        if given_range is None:
+            fixed_range = determine_histogram_edges('rtt', traces)
+
+        for trace in traces:
+            hist, xedges, yedges = generate_histogram('rtt', trace, fixed_range)
+            row = csr_matrix(hist.flatten())
+            if feature_matrix is None:
+                feature_matrix = row
+            else:
+                feature_matrix = csr_vappend(feature_matrix, row)
+            classes.append(traffic_types.index(trace.label))
+    elif feature == 'all':
+        raise NotImplementedError
+    else:
+        raise ValueError("Invalid feature: {}".format(feature))
+
+    return feature_matrix, classes, fixed_range
+
 # Generate a feature matrix with the 2D histogram data
 def build_feature_matrix_burst(traces, given_range = None):
 	if given_range is None:
@@ -198,9 +264,11 @@ def build_feature_matrix_both(traces, given_range = (None, None)):
 
 # Append a row to a csr matrix
 def csr_vappend(a,b):
-    """ Takes in 2 csr_matrices and appends the second one to the bottom of the first one. 
+    """
+    Takes in 2 csr_matrices and appends the second one to the bottom of the first one. 
     Much faster than scipy.sparse.vstack but assumes the type to be csr and overwrites
-    the first matrix instead of copying it. The data, indices, and indptr still get copied."""
+    the first matrix instead of copying it. The data, indices, and indptr still get copied.
+    """
 
     a.data = np.hstack((a.data,b.data))
     a.indices = np.hstack((a.indices,b.indices))
@@ -242,6 +310,53 @@ def determine_histogram_edges_burst(traces):
 	max_burst_size = np.max([min_burst_size_temp, max_burst_size_temp])
 
 	return [[min_burst_size, max_burst_size], [min_burst_time, max_burst_time]]
+
+def determine_histogram_edges(feature, traces):
+    """
+    Determines min and max values for histogram variables.
+
+    @param feature: The feature set to operate on. May be 'size_IAT', 'burst', or 'rtt'.
+    @param traces: A list of trace objects.
+    """
+
+    if feature == 'size_IAT':
+        raise NotImplementedError
+
+    elif feature == 'burst':
+        all_burst_size_values = []
+        all_burst_time_values = []
+        for trace in traces:
+            size, time = trace.get_burst_info()
+            all_burst_size_values.append(size)
+            all_burst_time_values.append(time)
+
+        # Get min and max burst times.
+        times = [item for sublist in all_burst_time_values for item in sublist]
+        min_y = log(np.amin(times))
+        max_y = log(np.amax(times))
+
+        # Get min and max bursts.
+        bursts = [item for sublist in all_burst_size_values for item in sublist]
+        min_burst_size_temp = log(abs(np.amin(bursts))) #FIXME Necessary?
+        max_burst_size_temp = log(abs(np.amax(bursts)))
+        max_size = np.max([min_burst_size_temp, max_burst_size_temp]) #FIXME Necessary?
+        min_x = -1 * max_size
+        max_x = max_size
+
+    elif feature == 'rtt':
+        # Get min and max RTTs
+        rtts = [rtt.rtt for trace in traces for rtt in trace.rtts]
+        min_x = log(np.amin(rtts)) # Find minimum RTT among all traces.
+        max_x = log(np.amax(rtts)) # Find maximum RTT among all traces.
+
+        # Min and max of services will be 1 to len(rtts) + 1
+        min_y = 1
+        max_y = len(rtts) + 1
+
+    else:
+        raise ValueError("Invalid feature: {}".format(feature))
+
+    return [[min_x, max_x], [min_y, max_y]]
 
 # Window all given traces
 def window_all_traces(traces, window_size = 1024):

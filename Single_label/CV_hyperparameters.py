@@ -71,6 +71,9 @@ if __name__ == "__main__":
         elif FEATURE == 'burst':
             feature_matrix, classes, train_range = build_feature_matrix_burst(train_list)
             feature_matrix_val, classes_val, val_range = build_feature_matrix_burst(val_list, train_range)
+        elif FEATURE == 'rtt':
+            feature_matrix, classes, train_range = build_feature_matrix('rtt', train_list)
+            feature_matrix_val, classes_val, val_range = build_feature_matrix('rtt', val_list, train_range)
         elif FEATURE == 'both':
             feature_matrix, classes, train_range = build_feature_matrix_both(train_list)
             feature_matrix_val, classes_val, val_range = build_feature_matrix_both(val_list, train_range)  
