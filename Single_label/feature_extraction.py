@@ -286,6 +286,7 @@ def consolidate_traces(traces):
             sizes = consolidated[t.label].get_timestamps() + t.get_timestamps()
             new_trace = Trace()
             new_trace.construct_trace(packets, sizes, t.label)
+            new_trace.rtts = consolidated[t.label].rtts + t.rtts
             consolidated[t.label] = new_trace
         else:
             consolidated[t.label] = t
