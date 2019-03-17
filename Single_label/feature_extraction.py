@@ -218,7 +218,7 @@ def build_feature_matrix(feature, traces, given_range=None):
 # Generate a feature matrix with the 2D histogram data
 def build_feature_matrix_burst(traces, given_range = None):
 	if given_range is None:
-		fixed_range = determine_histogram_edges_burst(traces)
+		fixed_range = determine_histogram_edges('burst', traces)
 	else:
 		fixed_range = given_range
 	classes = []
@@ -237,7 +237,7 @@ def build_feature_matrix_burst(traces, given_range = None):
 # Generate a feature matrix with the 2D histogram data
 def build_feature_matrix_size_IAT(traces, given_range = None):
 	if given_range is None:
-		fixed_range = determine_histogram_edges_size_IAT(traces)
+		fixed_range = determine_histogram_edges('size_IAT', traces)
 	else:
 		fixed_range = given_range
 	classes = []
@@ -275,41 +275,6 @@ def csr_vappend(a,b):
     a.indptr = np.hstack((a.indptr,(b.indptr + a.nnz)[1:]))
     a._shape = (a.shape[0]+b.shape[0],b.shape[1])
     return a
-
-# Find global max and min values in all training data to fix edges
-def determine_histogram_edges_size_IAT(traces):
-	all_IAT_values = [x.get_IAT() for x in traces]
-	all_size_values = [x.get_packetsizes() for x in traces]
-
-	min_IAT = log(np.amin([item for sublist in all_IAT_values for item in sublist]))
-	max_IAT = log(np.amax([item for sublist in all_IAT_values for item in sublist]))
-
-	min_size_temp = log(abs(np.amin([item for sublist in all_size_values for item in sublist])))
-	max_size_temp = log(abs(np.amax([item for sublist in all_size_values for item in sublist])))
-
-	min_size = -1*np.max([min_size_temp, max_size_temp])
-	max_size = np.max([min_size_temp, max_size_temp])
-
-	return [[min_size, max_size], [min_IAT, max_IAT]]
-
-def determine_histogram_edges_burst(traces):
-	all_burst_size_values = []
-	all_burst_time_values = []
-	for x in traces:
-		a,b = x.get_burst_info()
-		all_burst_size_values.append(a)
-		all_burst_time_values.append(b)
-
-	min_burst_time = log(np.amin([item for sublist in all_burst_time_values for item in sublist]))
-	max_burst_time = log(np.amax([item for sublist in all_burst_time_values for item in sublist]))
-
-	min_burst_size_temp = log(abs(np.amin([item for sublist in all_burst_size_values for item in sublist])))
-	max_burst_size_temp = log(abs(np.amax([item for sublist in all_burst_size_values for item in sublist])))
-
-	min_burst_size = -1*np.max([min_burst_size_temp, max_burst_size_temp])
-	max_burst_size = np.max([min_burst_size_temp, max_burst_size_temp])
-
-	return [[min_burst_size, max_burst_size], [min_burst_time, max_burst_time]]
 
 def determine_histogram_edges(feature, traces):
     """
