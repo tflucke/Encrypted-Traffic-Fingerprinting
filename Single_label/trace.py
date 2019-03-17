@@ -133,6 +133,10 @@ class Trace():
 			temp.construct_trace(packets[x*window_size:(x+1)*window_size], times[x*window_size:(x+1)*window_size], self.label)
 			windowed.append(temp)
 
+                # Add rtts list to first item in windowed.
+                if len(windowed) > 0:
+                    windowed[0].rtts = self.rtts
+
 		return windowed
 
 class RTT:
