@@ -68,8 +68,6 @@ if __name__ == "__main__":
                 filename += str(i.label) + '_burst.png'
             elif feature == 'rtt':
                 H, xedges, yedges = generate_histogram(feature, i, overall_range)
-                print(xedges)
-                print(yedges)
                 plt.xlabel('log(RTT)')
                 plt.ylabel('Service')
                 plt.title(str(i.label) + ' RTT')
