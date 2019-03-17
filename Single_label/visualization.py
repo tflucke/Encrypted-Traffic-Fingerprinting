@@ -40,12 +40,7 @@ if __name__ == "__main__":
     # Consolidate traces for each label.
     all_traces = consolidate_traces(all_traces)
     for feature in FEATURES:
-        if feature == 'size_IAT':
-            overall_range = determine_histogram_edges_size_IAT(all_traces)
-        elif feature == 'burst':
-            overall_range = determine_histogram_edges_burst(all_traces)
-        elif feature == 'rtt':
-            overall_range = determine_histogram_edges(feature, all_traces)
+        overall_range = determine_histogram_edges(feature, all_traces)
 
         # Plot all traces as a whole
         for i in all_traces:
