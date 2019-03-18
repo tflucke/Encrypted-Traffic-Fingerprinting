@@ -325,8 +325,12 @@ def determine_histogram_edges(feature, traces):
     elif feature == 'rtt':
         # Get min and max RTTs
         rtts = [rtt.rtt for trace in traces for rtt in trace.rtts]
-        min_x = log(np.amin(rtts)) # Find minimum RTT among all traces.
-        max_x = log(np.amax(rtts)) # Find maximum RTT among all traces.
+        try:
+            min_x = log(np.amin(rtts)) # Find minimum RTT among all traces.
+            max_x = log(np.amax(rtts)) # Find maximum RTT among all traces.
+        except ValueError:
+            min_x = 0
+            max_x = 0
 
         # Min and max of services will be 1 to len(rtts) + 1
         min_y = 0
