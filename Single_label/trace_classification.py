@@ -291,6 +291,7 @@ if __name__ == "__main__":
     #title = 'Normalized confusion matrix for ' + trace_file + ' ' + args.
     title = trace_file.replace('_', ' ') + ' ' + args.feature + ' using ' + args.method
     plot_confusion_matrix(cnf_matrix, classes=traffic_types, title=title)
+    plt.tight_layout()
 
     filename = "confusion_matrix_" + trace_file + '_'
     filename += args.mode + '_' + args.feature + '_' + args.method + '.png'
