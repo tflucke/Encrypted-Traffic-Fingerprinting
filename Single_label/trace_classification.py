@@ -214,6 +214,11 @@ if __name__ == "__main__":
              'RF': {'n_estimators': 24},
              'MLP': {'alpha': 1.0000000000000001e-05, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
              'LR': {'C': 100000, 'tol': 0.0001}}, 
+         'rtt':
+            {'NB':{'alpha': 1.0000000000000001e-05}, 
+             'RF': {'n_estimators': 24},
+             'MLP': {'alpha': 1.0000000000000001e-05, 'max_iter' : 300, 'hidden_layer_sizes' : (100,100,100)},
+             'LR': {'C': 100000, 'tol': 0.0001}}, 
          'both': {
              'NB':{'alpha': 0.001}, 
              'RF': {'n_estimators': 16},
@@ -261,6 +266,9 @@ if __name__ == "__main__":
     elif args.feature == 'burst':
         feature_matrix, classes, train_range = build_feature_matrix_burst(X_train_val)
         feature_matrix_test, classes_test, test_range = build_feature_matrix_burst(X_test, train_range)
+    elif args.feature == 'rtt':
+        feature_matrix, classes, train_range = build_feature_matrix('rtt', X_train_val)
+        feature_matrix_test, classes_test, test_range = build_feature_matrix('rtt', X_test, train_range)
     elif args.feature == 'both':
         feature_matrix, classes, train_range = build_feature_matrix_both(X_train_val)
         feature_matrix_test, classes_test, test_range = build_feature_matrix_both(X_test, train_range)   
