@@ -9,7 +9,8 @@ from scipy.sparse import csr_matrix, vstack, hstack
 import sys
 
 # traffic_types = ['HTTP', 'Skype', 'Torrent', 'Youtube']
-traffic_types = ['HTTP', 'SSH', 'Dominion', 'Youtube']
+#traffic_types = ['HTTP', 'SSH', 'Dominion', 'Youtube']
+traffic_types = ['Github', 'Twitter', 'DuckDuckGo', 'YouTube']
 BINS = 32
 nan_hist =  np.empty((BINS,BINS), np.float64)
 nan_hist[:] = np.NAN
@@ -100,7 +101,7 @@ pars = {
 		'ip': '192.168.0.2'		
 	},
 	'tor':{
-		'path': 'tor_traces/',
+		'path': 'tor_traces/HTTP/',
 		'object_file': 'tor_traces/pickled_traces.dat',
 		#'ip': '192.168.2 .2'
                 'ip': '10.0.2.15' # IP address of virtual machine
