@@ -9,11 +9,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import cross_val_score, KFold, train_test_split, ParameterGrid
+from sklearn.metrics import confusion_matrix
 
 import itertools
 import matplotlib.pyplot as plt
 import sys
-from sklearn.metrics import confusion_matrix
+import argparse as ap
 
 #FEATURE = 'size_IAT' # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
 #METHOD = 'LR' # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
@@ -27,12 +28,21 @@ def log(s):
 
 # Example usage: python2 CV_hyerparameters.py tor burst LR
 if __name__ == "__main__":
-    mode = sys.argv[1] # Type of data to test
-    FEATURE = sys.argv[2] # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
-    METHOD = sys.argv[3] # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
-    if len(sys.argv) > 4:
+    parser = ap.ArgumentParser(description = "Create visualizations from data")
+    parser.add_argument('mode', metavar = 'mode', type = str,
+                        action = 'store', help = 'The mode to use.')
+    parser.add_argument('feature', metavar = 'feature',
+                        help = "The feature to use. May be 'size_IAT', 'burst', 'rtt', or 'all'")
+    parser.add_argument('method', metavar = 'method',
+                        help = "The method to use. May be 'NB' (Naive Bayes), 'LR' (logistic regression), or 'RF' (random forest)")
+    parser.add_argument('trace', metavar = 'trace_file', nargs = '?')
+    args = parser.parse_args()
+
+    mode = args.mode # Type of data to test
+    FEATURE = args.feature # use burst features or size_IAT ('size_IAT', 'burst' or 'both')
+    METHOD = args.method # options: 'NB' : Naive Bayes, 'RF' : random forest, 'MLP' : , 'LR': logistic regression
+    if args.trace:
         all_traces = load_pickled_traces(mode, sys.argv[4])
-        # for t in all_traces: print t.label
     else:
         all_traces = load_pickled_traces(mode)
     windowed_traces = window_all_traces(all_traces)
@@ -71,6 +81,9 @@ if __name__ == "__main__":
         elif FEATURE == 'burst':
             feature_matrix, classes, train_range = build_feature_matrix_burst(train_list)
             feature_matrix_val, classes_val, val_range = build_feature_matrix_burst(val_list, train_range)
+        elif FEATURE == 'rtt':
+            feature_matrix, classes, train_range = build_feature_matrix('rtt', train_list)
+            feature_matrix_val, classes_val, val_range = build_feature_matrix('rtt', val_list, train_range)
         elif FEATURE == 'both':
             feature_matrix, classes, train_range = build_feature_matrix_both(train_list)
             feature_matrix_val, classes_val, val_range = build_feature_matrix_both(val_list, train_range)  

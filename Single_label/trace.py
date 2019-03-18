@@ -17,6 +17,7 @@ class Trace():
 		self.label = ""
 		self.timestamps = []
 		self.packetsizes = []
+                self.rtts = []
 		self.num_packets = 0
 		self.local_ip = ip
 
@@ -27,13 +28,26 @@ class Trace():
                 #print "Sorting pcap..."
 		trace = sorted(trace, key=lambda ts: ts.time)
                 #print "Processing packets..."
+                rtts = {}
 		for p in trace:
-			if "IP" in p:
+			if 'IP' in p:
 				self.timestamps.append(p.time)
 				if p['IP'].src == self.local_ip:
 					self.packetsizes.append(len(p))
 				else:
 					self.packetsizes.append(-1*len(p))
+                        # Calculate RTTs.
+                        if 'TCP' in p:
+                                if p['TCP'].flags == 0x02: # SYN packet.
+                                        rtts[p['TCP'].seq] = RTT(p.time, p['TCP'].seq, p['IP'].src, p['IP'].dst)
+                                # SYN/ACK packet.
+                                elif p['TCP'].flags ==  0x12 and p['TCP'].ack - 1 in rtts:
+                                        rtts[p['TCP'].ack - 1].set_ack(p['TCP'].ack)
+                                # ACK packet for SYN/ACK.
+                                elif p['TCP'].flags ==  0x10 and p['TCP'].seq - 1 in rtts:
+                                        rtts[p['TCP'].seq - 1].set_rtt(p.time)
+
+                self.rtts = [rtt for _, rtt in rtts.iteritems() if rtt.rtt]
 		self.num_packets = len(self.packetsizes)
 
 	def construct_trace(self, packets, times, label):
@@ -119,5 +133,42 @@ class Trace():
 			temp.construct_trace(packets[x*window_size:(x+1)*window_size], times[x*window_size:(x+1)*window_size], self.label)
 			windowed.append(temp)
 
+                # Add rtts list to first item in windowed.
+                if len(windowed) > 0:
+                    windowed[0].rtts = self.rtts
+
 		return windowed
 
+class RTT:
+        """ Represent the round trip time (RTT) of a TCP connection. """
+        def __init__(self, time, seq, src, dst):
+                self.syn_time = time
+                self.seq = seq
+                self.ack = None
+                self.rtt = None
+                self.src = src
+                self.dst = dst
+
+        def __repr__(self):
+                rstr = "<RTT syn_time:{} seq:{} ack:{} rtt: {} src:{} dst:{}>"
+                return rstr.format(self.syn_time, self.seq, self.ack, self.rtt, self.src, self.dst)
+
+        def set_ack(self, ack):
+                """
+                Sets the ACK number from a SYN/ACK packet.
+                @param ack: The ACK number from a SYN/ACK packet.
+                """
+                self.ack = ack
+
+        def set_rtt(self, t):
+                """
+                Calculates the initial RTT of a TCP connection.
+                @param t: The time an ACK to a SYN/ACK is sent.
+                """
+                self.rtt = t - self.syn_time
+
+        def get_rtt(self):
+                """
+                Returns the RTT. Will be None if the RTT has not been set with set_rtt.
+                """
+                return self.rtt
