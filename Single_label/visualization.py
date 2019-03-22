@@ -15,6 +15,8 @@ if __name__ == "__main__":
     parser = ap.ArgumentParser(description = "Create visualizations from data")
     parser.add_argument('mode', metavar = 'mode', type = str,
                         action = 'store', help = 'The mode to use.')
+    parser.add_argument('feature', metavar = 'feature', nargs = '?',
+                        help = 'Evaluate only the specified feature.')
     parser.add_argument('--trace', dest = 'trace_file')
     parser.add_argument('--show', action = 'store_true',
                         help = 'Display figures after saving them to file.')
@@ -39,6 +41,11 @@ if __name__ == "__main__":
 
     # Consolidate traces for each label.
     all_traces = consolidate_traces(all_traces)
+
+    # Adjust feature set.
+    if args.feature:
+        FEATURES = [args.feature]
+
     for feature in FEATURES:
         overall_range = determine_histogram_edges(feature, all_traces)
 
@@ -62,11 +69,18 @@ if __name__ == "__main__":
                 plt.title(str(i.label) + ' Burst')
                 filename += str(i.label) + '_burst.png'
             elif feature == 'rtt':
-                H, xedges, yedges = generate_histogram(feature, i, overall_range)
-                plt.xlabel('log(RTT)')
-                plt.ylabel('Service')
+                #H, xedges, yedges = generate_histogram(feature, i, overall_range)
+                rtts = [rtt.rtt for rtt in i.rtts]
+                print("number of RTTS: {}".format(len(rtts)))
+                n, bins, patches = plt.hist(rtts, 25, facecolor='blue', alpha=0.5)
+                #plt.xlabel('RTT')
+                plt.ylabel('RTT')
                 plt.title(str(i.label) + ' RTT')
                 filename += str(i.label) + '_rtt.png'
+                plt.savefig(filename)
+                if args.show:
+                    plt.show()
+                continue
 
             X, Y = np.meshgrid(xedges, yedges)
             a = plt.pcolormesh(X, Y, H.transpose()[::-1])
