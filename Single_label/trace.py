@@ -44,9 +44,11 @@ class Trace():
                                 elif p['TCP'].flags ==  0x12 and p['TCP'].ack - 1 in rtts:
                                         rtts[p['TCP'].ack - 1].set_ack(p['TCP'].ack)
                                 # ACK packet for SYN/ACK.
-                                elif p['TCP'].flags ==  0x10 and p['TCP'].seq - 1 in rtts:
+                                elif (p['TCP'].flags & 0x10) > 0 and p['TCP'].seq - 1 in rtts:
                                         rtts[p['TCP'].seq - 1].set_rtt(p.time)
 
+                if rtts:
+                    print("*** Found {} RTTs ***".format(len(rtts)))
                 self.rtts = [rtt for _, rtt in rtts.iteritems() if rtt.rtt]
 		self.num_packets = len(self.packetsizes)
 
